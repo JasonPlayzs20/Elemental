@@ -1,12 +1,17 @@
 package com.jason.elements;
 
+import com.jason.Effects;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 
 import static com.jason.Elemental.MOD_ID;
@@ -32,6 +37,8 @@ public class AffectedElement {
     public static AffectedElements getAffectedElements(AttachmentTarget target) {
         return new AffectedElements(target);
     }
+
+
 
     public record AffectedElements(AttachmentTarget target) {
         private static int defaultTicking = 9*20;
@@ -61,20 +68,40 @@ public class AffectedElement {
             return defaultTicking;
         }
 
-        public boolean affectPyro() {
-            this.target.modifyAttached(PYRO_TICKS, defaultTicking -> defaultTicking);
+        public boolean affectPyro(LivingEntity entity) {
+            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithPyro()) {
+                Effects.textEffect("Hot", level, ChatFormatting.RED,
+                        entity.getX(), entity.getY(), entity.getZ());
+            }
+            this.target.setAttached(PYRO_TICKS, defaultTicking);
+
             return true;
         }
-        public boolean affectCryo() {
-            this.target.modifyAttached(CRYO_TICKS, defaultTicking -> defaultTicking);
+        public boolean affectCryo(LivingEntity entity) {
+            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithCryo()) {
+                Effects.textEffect("Freeze", level, ChatFormatting.WHITE,
+                        entity.getX(), entity.getY(), entity.getZ());
+            }
+            this.target.setAttached(CRYO_TICKS, defaultTicking);
+
             return true;
         }
-        public boolean affectHydro() {
-            this.target.modifyAttached(HYDRO_TICKS, defaultTicking -> defaultTicking);
+        public boolean affectHydro(LivingEntity entity) {
+//            System.out.println(getHydroTick());
+            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithHydro()) {
+                Effects.textEffect("Wet", level, ChatFormatting.BLUE,
+                        entity.getX(), entity.getY() , entity.getZ());
+            }
+            this.target.setAttached(HYDRO_TICKS, defaultTicking);
             return true;
         }
-        public boolean affectElectro() {
-            this.target.modifyAttached(ELECTRO_TICKS, defaultTicking -> defaultTicking);
+        public boolean affectElectro(LivingEntity entity) {
+            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithElectro()) {
+                Effects.textEffect("Shock", level, ChatFormatting.YELLOW,
+                        entity.getX(), entity.getY(), entity.getZ());
+            }
+            this.target.setAttached(ELECTRO_TICKS, defaultTicking);
+
             return true;
         }
 
@@ -117,10 +144,11 @@ public class AffectedElement {
         }
 
         public void tick() {
-            this.target.modifyAttached(PYRO_TICKS, defaultTicking -> defaultTicking - 1);
-            this.target.modifyAttached(CRYO_TICKS, defaultTicking -> defaultTicking - 1);
-            this.target.modifyAttached(HYDRO_TICKS, defaultTicking -> defaultTicking - 1);
-            this.target.modifyAttached(ELECTRO_TICKS, defaultTicking -> defaultTicking - 1);
+            this.target.modifyAttached(PYRO_TICKS, val -> val == null ? 0 : val - 1);
+            this.target.modifyAttached(CRYO_TICKS, val -> val == null ? 0 : val - 1);
+            this.target.modifyAttached(HYDRO_TICKS, val -> val == null ? 0 : val - 1);
+            this.target.modifyAttached(ELECTRO_TICKS, val -> val == null ? 0 : val - 1);
+//            System.out.println(getHydroTick());
         }
 
         public int getPyroTick() {

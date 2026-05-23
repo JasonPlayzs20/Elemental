@@ -1,9 +1,14 @@
 package com.jason;
 
+import com.jason.elements.AffectedElement;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,5 +33,22 @@ public class Elemental implements ModInitializer {
 		ItemTest.initialize();
 		// Register the group.
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ELEMENTAL_ITEM_TAB, CUSTOM_CREATIVE_TAB);
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			Effects.tick(server);
+			for (ServerLevel level : server.getAllLevels()) {
+
+			}
+		});
+//		var _ = AffectedElement.getAffectedElements(null);
+//
+//		ServerTickEvents.END_SERVER_TICK.register(server -> {
+//			Effects.tick(server);
+//			for (ServerLevel level : server.getAllLevels()) {
+//				for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(-30000000, -64, -30000000, 30000000, 320, 30000000))) {
+//					AffectedElement.getAffectedElements(entity).tick();
+//				}
+//			}
+//		});
+
 	}
 }
