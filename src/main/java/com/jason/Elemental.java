@@ -1,8 +1,11 @@
 package com.jason;
 
 import com.jason.elements.AffectedElement;
+import com.jason.elements.Reaction;
+import com.jason.test.TestSkills;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -31,10 +34,17 @@ public class Elemental implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
 		ItemTest.initialize();
+		TestSkills.initialize();
+		Reaction.initReaction();
 		// Register the group.
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ELEMENTAL_ITEM_TAB, CUSTOM_CREATIVE_TAB);
+		CreativeModeTabEvents.modifyOutputEvent(ELEMENTAL_ITEM_TAB).register(output -> {
+			output.accept(TestSkills.PYRO_CIRCLE);
+			output.accept(TestSkills.HYDRO_CIRCLE);
+		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			Effects.tick(server);
+			TestSkills.tick(server);
 			for (ServerLevel level : server.getAllLevels()) {
 
 			}

@@ -8,3 +8,4 @@ public enum Elements {
     CRYO,
     DENDRO;
 }
+//TODO Add dedro and anemo, , reaction,

@@ -10,6 +10,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
 
 import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
@@ -31,6 +32,14 @@ public class AffectedElement {
     );
     private static final AttachmentType<Integer> ELECTRO_TICKS = AttachmentRegistry.create(
             Identifier.fromNamespaceAndPath("elemental", "electro_ticks"),
+            builder -> builder.syncWith(ByteBufCodecs.INT, AttachmentSyncPredicate.all())
+    );
+    private static final AttachmentType<Integer> ANEMO_TICKS = AttachmentRegistry.create(
+            Identifier.fromNamespaceAndPath("elemental", "anemo_ticks"),
+            builder -> builder.syncWith(ByteBufCodecs.INT, AttachmentSyncPredicate.all())
+    );
+    private static final AttachmentType<Integer> DENDRO_TICKS = AttachmentRegistry.create(
+            Identifier.fromNamespaceAndPath("elemental", "dendro_ticks"),
             builder -> builder.syncWith(ByteBufCodecs.INT, AttachmentSyncPredicate.all())
     );
 
@@ -57,6 +66,12 @@ public class AffectedElement {
             if (getElectroTick() > 0) {
                 elements.add(Elements.ELECTRO);
             }
+            if (getAnemoTick() > 0) {
+                elements.add(Elements.ANEMO);
+            }
+            if (getDendroTick() > 0) {
+                elements.add(Elements.DENDRO);
+            }
             return elements;
         }
 
@@ -69,7 +84,7 @@ public class AffectedElement {
         }
 
         public boolean affectPyro(LivingEntity entity) {
-            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithPyro()) {
+            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithPyro() && !(entity instanceof ArmorStand)) {
                 Effects.textEffect("Hot", level, ChatFormatting.RED,
                         entity.getX(), entity.getY(), entity.getZ());
             }
@@ -78,7 +93,7 @@ public class AffectedElement {
             return true;
         }
         public boolean affectCryo(LivingEntity entity) {
-            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithCryo()) {
+            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithCryo()&& !(entity instanceof ArmorStand)) {
                 Effects.textEffect("Freeze", level, ChatFormatting.WHITE,
                         entity.getX(), entity.getY(), entity.getZ());
             }
@@ -88,7 +103,7 @@ public class AffectedElement {
         }
         public boolean affectHydro(LivingEntity entity) {
 //            System.out.println(getHydroTick());
-            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithHydro()) {
+            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithHydro()&& !(entity instanceof ArmorStand)) {
                 Effects.textEffect("Wet", level, ChatFormatting.BLUE,
                         entity.getX(), entity.getY() , entity.getZ());
             }
@@ -96,7 +111,7 @@ public class AffectedElement {
             return true;
         }
         public boolean affectElectro(LivingEntity entity) {
-            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithElectro()) {
+            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithElectro()&& !(entity instanceof ArmorStand)) {
                 Effects.textEffect("Shock", level, ChatFormatting.YELLOW,
                         entity.getX(), entity.getY(), entity.getZ());
             }
@@ -104,6 +119,22 @@ public class AffectedElement {
 
             return true;
         }
+        public boolean affectAnemo(LivingEntity entity) {
+
+            this.target.setAttached(ANEMO_TICKS, 2);
+
+            return true;
+        }
+        public boolean affectDendro(LivingEntity entity) {
+            if (entity.level() instanceof ServerLevel level && !AffectedElement.getAffectedElements(entity).isAffectedWithElectro()&& !(entity instanceof ArmorStand)) {
+                Effects.textEffect("Growth", level, ChatFormatting.GREEN,
+                        entity.getX(), entity.getY(), entity.getZ());
+            }
+            this.target.setAttached(DENDRO_TICKS, defaultTicking);
+
+            return true;
+        }
+
 
         public boolean removePyro() {
             this.target.modifyAttached(PYRO_TICKS, defaultTicking -> 0);
@@ -121,12 +152,23 @@ public class AffectedElement {
             this.target.modifyAttached(ELECTRO_TICKS, defaultTicking -> 0);
             return true;
         }
+        public boolean removeAnemo() {
+            this.target.modifyAttached(ANEMO_TICKS, defaultTicking -> 0);
+            return true;
+        }
+        public boolean removeDendro() {
+            this.target.modifyAttached(DENDRO_TICKS, defaultTicking -> 0);
+            return true;
+        }
+
 
         public boolean removeAllElements() {
             this.target.modifyAttached(PYRO_TICKS, defaultTicking -> 0);
             this.target.modifyAttached(CRYO_TICKS, defaultTicking -> 0);
             this.target.modifyAttached(HYDRO_TICKS, defaultTicking -> 0);
             this.target.modifyAttached(ELECTRO_TICKS, defaultTicking -> 0);
+            this.target.modifyAttached(ANEMO_TICKS, defaultTicking -> 0);
+            this.target.modifyAttached(DENDRO_TICKS, defaultTicking -> 0);
             return true;
         }
 
@@ -142,12 +184,16 @@ public class AffectedElement {
         public boolean isAffectedWithElectro() {
             return this.target.getAttachedOrElse(ELECTRO_TICKS,0) > 0;
         }
+        public boolean isAffectedWithAnemo() {return this.target.getAttachedOrElse(ANEMO_TICKS,0) > 0;}
+        public boolean isAffectedWithDendro() {return this.target.getAttachedOrElse(DENDRO_TICKS,0) > 0;}
 
         public void tick() {
             this.target.modifyAttached(PYRO_TICKS, val -> val == null ? 0 : val - 1);
             this.target.modifyAttached(CRYO_TICKS, val -> val == null ? 0 : val - 1);
             this.target.modifyAttached(HYDRO_TICKS, val -> val == null ? 0 : val - 1);
             this.target.modifyAttached(ELECTRO_TICKS, val -> val == null ? 0 : val - 1);
+            this.target.modifyAttached(ANEMO_TICKS, val -> val == null ? 0 : val - 1);
+            this.target.modifyAttached(DENDRO_TICKS, val -> val == null ? 0 : val - 1);
 //            System.out.println(getHydroTick());
         }
 
@@ -163,5 +209,7 @@ public class AffectedElement {
         public int getElectroTick() {
             return this.target.getAttachedOrElse(ELECTRO_TICKS,0);
         }
+        public int getAnemoTick() {return this.target.getAttachedOrElse(ANEMO_TICKS,0);}
+        public int getDendroTick() {return this.target.getAttachedOrElse(DENDRO_TICKS,0);}
     }
 }

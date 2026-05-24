@@ -26,6 +26,8 @@ public class ItemTest {
     public static final Item PYRO_ATK = register("pyro_atk", Item::new, new Item.Properties());
     public static final Item ELECTRO_ATK = register("electro_atk", Item::new, new Item.Properties());
     public static final Item CRYO_ATK = register("cryo_atk", Item::new, new Item.Properties());
+    public static final Item ANEMO_ATK = register("anemo_atk", Item::new, new Item.Properties());
+    public static final Item DENDRO_ATK = register("dendro_atk", Item::new, new Item.Properties());
 
     public static void initialize() {
     }

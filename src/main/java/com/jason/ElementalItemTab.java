@@ -21,6 +21,8 @@ public class ElementalItemTab {
                 output.accept(ItemTest.PYRO_ATK);
                 output.accept(ItemTest.ELECTRO_ATK);
                 output.accept(ItemTest.CRYO_ATK);
+                output.accept(ItemTest.ANEMO_ATK);
+                output.accept(ItemTest.DENDRO_ATK);
 
             })
             .build();
