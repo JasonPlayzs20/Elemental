@@ -1,6 +1,7 @@
 package com.jason.elements;
 
 import com.jason.Effects;
+import com.jason.reactions.AffectedReaction;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
@@ -103,11 +104,13 @@ public class AffectedElement {
         }
         public boolean affectHydro(LivingEntity entity) {
 //            System.out.println(getHydroTick());
-            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithHydro()&& !(entity instanceof ArmorStand)) {
+            if (entity.level() instanceof ServerLevel level&& !AffectedElement.getAffectedElements(entity).isAffectedWithHydro()&& !(entity instanceof ArmorStand) && !AffectedReaction.get(entity).isFrozen()) {
                 Effects.textEffect("Wet", level, ChatFormatting.BLUE,
                         entity.getX(), entity.getY() , entity.getZ());
             }
-            this.target.setAttached(HYDRO_TICKS, defaultTicking);
+            if (!AffectedReaction.get(entity).isFrozen()) {
+                this.target.setAttached(HYDRO_TICKS, defaultTicking);
+            }
             return true;
         }
         public boolean affectElectro(LivingEntity entity) {

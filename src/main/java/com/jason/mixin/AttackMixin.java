@@ -4,13 +4,11 @@ import com.jason.Damages;
 import com.jason.ItemTest;
 import com.jason.elements.AffectedElement;
 import com.jason.elements.Elements;
-import net.minecraft.advancements.criterion.PlayerHurtEntityTrigger;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.behavior.StartAttacking;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,7 +16,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static com.jason.elements.Reaction.calculateReactionAndAction;
+import static com.jason.reactions.Reaction.calculateReactionAndAction;
+import static com.jason.reactions.SecondaryReactions.calculateSecondaryReactions;
 
 @Mixin(Player.class)
 public class AttackMixin {
@@ -67,19 +66,23 @@ public class AttackMixin {
             AffectedElement.getAffectedElements(entity).affectHydro((LivingEntity)livingEntity);
             System.out.println("HYDRO");
             System.out.println(AffectedElement.getAffectedElements(entity).isAffectedWithHydro());
-           livingEntity.hurtServer((ServerLevel) player.level(), hydroSource, (float) calculateReactionAndAction(livingEntity,2, Elements.HYDRO));
+            double dmg = calculateReactionAndAction(livingEntity,2, Elements.HYDRO) + calculateSecondaryReactions(livingEntity,2,Elements.HYDRO);
+           livingEntity.hurtServer((ServerLevel) player.level(), hydroSource, (float) dmg);
         }
         else if (itemStack.is(ItemTest.PYRO_ATK)) {
             AffectedElement.getAffectedElements(entity).affectPyro((LivingEntity)livingEntity);
-           livingEntity.hurtServer((ServerLevel) player.level(), pyroSource, (float) calculateReactionAndAction(livingEntity,2, Elements.PYRO));
+            double dmg = calculateReactionAndAction(livingEntity,2, Elements.PYRO) + calculateSecondaryReactions(livingEntity,2,Elements.PYRO);
+           livingEntity.hurtServer((ServerLevel) player.level(), pyroSource, (float) dmg);
         }
         else if (itemStack.is(ItemTest.ELECTRO_ATK)) {
             AffectedElement.getAffectedElements(entity).affectElectro((LivingEntity)livingEntity);
-           livingEntity.hurtServer((ServerLevel) player.level(), electroSource, (float) calculateReactionAndAction(livingEntity,2, Elements.ELECTRO));
+            double dmg = calculateReactionAndAction(livingEntity,2, Elements.ELECTRO) + calculateSecondaryReactions(livingEntity,2,Elements.ELECTRO);
+           livingEntity.hurtServer((ServerLevel) player.level(), electroSource, (float) dmg);
         }
         else if (itemStack.is(ItemTest.CRYO_ATK)) {
             AffectedElement.getAffectedElements(entity).affectCryo((LivingEntity)livingEntity);
-           livingEntity.hurtServer((ServerLevel) player.level(), cryoSource, (float) calculateReactionAndAction(livingEntity,2, Elements.CRYO));
+            double dmg = calculateReactionAndAction(livingEntity,2, Elements.CRYO) + calculateSecondaryReactions(livingEntity,2,Elements.CRYO);
+           livingEntity.hurtServer((ServerLevel) player.level(), cryoSource, (float) dmg);
         }
         else if (itemStack.is(ItemTest.ANEMO_ATK)) {
             AffectedElement.getAffectedElements(entity).affectAnemo(livingEntity);

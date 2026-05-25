@@ -1,7 +1,7 @@
 package com.jason;
 
-import com.jason.elements.AffectedElement;
-import com.jason.elements.Reaction;
+import com.jason.reactions.Reaction;
+import com.jason.reactions.SecondaryReactions;
 import com.jason.test.TestSkills;
 import net.fabricmc.api.ModInitializer;
 
@@ -10,8 +10,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.AABB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +34,7 @@ public class Elemental implements ModInitializer {
 		ItemTest.initialize();
 		TestSkills.initialize();
 		Reaction.initReaction();
+		SecondaryReactions.initSecondaryReactions();
 		// Register the group.
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ELEMENTAL_ITEM_TAB, CUSTOM_CREATIVE_TAB);
 		CreativeModeTabEvents.modifyOutputEvent(ELEMENTAL_ITEM_TAB).register(output -> {
@@ -49,6 +48,7 @@ public class Elemental implements ModInitializer {
 
 			}
 		});
+		//TODO make a duplecate of the reaction class for reaction with element reaction
 //		var _ = AffectedElement.getAffectedElements(null);
 //
 //		ServerTickEvents.END_SERVER_TICK.register(server -> {
